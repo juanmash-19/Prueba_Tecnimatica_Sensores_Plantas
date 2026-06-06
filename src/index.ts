@@ -19,14 +19,12 @@ app.use(errorHandler);
 
 const port = Number(process.env.PORT ?? 3000);
 
-async function start() {
-  await initDatabase();
+try {
+  initDatabase();
   app.listen(port, () => {
     console.log(`Server listening on http://localhost:${port}`);
   });
-}
-
-start().catch((error) => {
+} catch (error) {
   console.error(error);
   process.exit(1);
-});
+}

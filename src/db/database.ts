@@ -1,53 +1,53 @@
 import fs from 'fs';
 import path from 'path';
-import sqlite3 from 'sqlite3';
-import { Database, open } from 'sqlite';
+import Database from 'better-sqlite3';
 
-const dbPath = path.resolve(process.cwd(), 'data', 'monitoring.db');
+const dbPath = path.resolve(process.cwd(), '../../data/monitoring.db');
 const schemaPath = path.resolve(process.cwd(), 'schema.sql');
 
-async function ensureDataDir() {
+function ensureDataDir() {
   const directory = path.dirname(dbPath);
 
   if (!fs.existsSync(directory)) {
-    await fs.promises.mkdir(directory, { recursive: true });
+    fs.mkdirSync(directory, { recursive: true });
   }
 }
 
-let databaseInstance: Database | null = null;
+function createDatabase() {
+  ensureDataDir();
 
-export async function initDatabase(): Promise<Database> {
-  if (databaseInstance) {
-    return databaseInstance;
-  }
+  const db = new Database(dbPath);
+  db.pragma('foreign_keys = ON');
+  db.pragma('journal_mode = WAL');
 
-  await ensureDataDir();
+  const sensorsTable = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'sensors'").get();
+  const sensorsCount = sensorsTable
+    ? (db.prepare('SELECT COUNT(*) as count FROM sensors').get() as { count: number })
+    : { count: 0 };
 
-  const db = await open({
-    filename: dbPath,
-    driver: sqlite3.Database,
-  });
-
-  await db.exec('PRAGMA foreign_keys = ON;');
-  await db.exec('PRAGMA journal_mode = WAL;');
-
-  const table = await db.get("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'sensors'");
-
-  if (!table) {
+  if (!sensorsTable || sensorsCount.count === 0) {
     const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-    await db.exec(schemaSql);
+    db.exec(schemaSql);
   }
 
-  databaseInstance = db;
   return db;
 }
 
-export async function getDb(): Promise<Database> {
+type DatabaseConnection = ReturnType<typeof createDatabase>;
+
+let databaseInstance: DatabaseConnection | null = null;
+
+export function initDatabase(): DatabaseConnection {
   if (databaseInstance) {
     return databaseInstance;
   }
 
-  return initDatabase();
+  databaseInstance = createDatabase();
+  return databaseInstance;
+}
+
+export function getDb(): DatabaseConnection {
+  return databaseInstance ?? initDatabase();
 }
 
 export default getDb;

@@ -11,7 +11,7 @@ const validTypes: SensorType[] = ['temperatura', 'presion', 'vibracion', 'flujo'
 const validStatuses: MonitoringStatus[] = ['activo', 'pausado'];
 
 export async function getAll(status?: MonitoringStatus): Promise<MonitoringWithDetails[]> {
-  const db = await getDb();
+  const db = getDb();
   let sql = `SELECT m.*, s.name as sensor_name, s.type as sensor_type, z.name as zone_name, z.location as zone_location
     FROM monitorings m
     JOIN sensors s ON m.sensor_id = s.id
@@ -23,25 +23,24 @@ export async function getAll(status?: MonitoringStatus): Promise<MonitoringWithD
     params.push(status);
   }
 
-  return db.all(sql, ...params) as Promise<MonitoringWithDetails[]>;
+  return db.prepare(sql).all(...params) as MonitoringWithDetails[];
 }
 
 export async function getById(id: number): Promise<MonitoringWithDetails | null> {
-  const db = await getDb();
-  const row = await db.get(
+  const db = getDb();
+  const row = db.prepare(
     `SELECT m.*, s.name as sensor_name, s.type as sensor_type, z.name as zone_name, z.location as zone_location
      FROM monitorings m
      JOIN sensors s ON m.sensor_id = s.id
      JOIN zones z ON m.zone_id = z.id
-     WHERE m.id = ?`,
-    id
-  );
+     WHERE m.id = ?`
+  ).get(id) as MonitoringWithDetails | undefined;
 
   return row || null;
 }
 
 export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDetails> {
-  const db = await getDb();
+  const db = getDb();
 
   if (!validTypes.includes(dto.reading_type)) {
     const error: any = new Error('reading_type inválido');
@@ -61,7 +60,7 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
     throw error;
   }
 
-  const sensor = await db.get('SELECT id FROM sensors WHERE id = ?', dto.sensor_id);
+  const sensor = db.prepare('SELECT id FROM sensors WHERE id = ?').get(dto.sensor_id);
 
   if (!sensor) {
     const error: any = new Error('Sensor no existe');
@@ -69,7 +68,7 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
     throw error;
   }
 
-  const zone = await db.get('SELECT id FROM zones WHERE id = ?', dto.zone_id);
+  const zone = db.prepare('SELECT id FROM zones WHERE id = ?').get(dto.zone_id);
 
   if (!zone) {
     const error: any = new Error('Zone no existe');
@@ -77,7 +76,7 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
     throw error;
   }
 
-  const exists = await db.get('SELECT id FROM monitorings WHERE sensor_id = ? AND zone_id = ?', dto.sensor_id, dto.zone_id);
+  const exists = db.prepare('SELECT id FROM monitorings WHERE sensor_id = ? AND zone_id = ?').get(dto.sensor_id, dto.zone_id);
 
   if (exists) {
     const error: any = new Error('Monitoring para ese sensor y zona ya existe');
@@ -85,25 +84,19 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
     throw error;
   }
 
-  const info = await db.run(
+  const info = db.prepare(
     `INSERT INTO monitorings (sensor_id, zone_id, install_date, reading_type, threshold_value, status)
      VALUES (?, ?, ?, ?, ?, ?)`,
-    dto.sensor_id,
-    dto.zone_id,
-    dto.install_date,
-    dto.reading_type,
-    dto.threshold_value,
-    dto.status ?? 'activo'
-  );
+  ).run(dto.sensor_id, dto.zone_id, dto.install_date, dto.reading_type, dto.threshold_value, dto.status ?? 'activo');
 
-  const id = (info as any).lastID as number;
+  const id = Number(info.lastInsertRowid);
   const created = await getById(id);
 
   return created as MonitoringWithDetails;
 }
 
 export async function update(id: number, dto: UpdateMonitoringDTO): Promise<MonitoringWithDetails> {
-  const db = await getDb();
+  const db = getDb();
 
   if (!dto || (dto.threshold_value === undefined && dto.status === undefined)) {
     const error: any = new Error('Sin campos para actualizar');
@@ -111,7 +104,7 @@ export async function update(id: number, dto: UpdateMonitoringDTO): Promise<Moni
     throw error;
   }
 
-  const existing = await db.get('SELECT * FROM monitorings WHERE id = ?', id);
+  const existing = db.prepare('SELECT * FROM monitorings WHERE id = ?').get(id);
 
   if (!existing) {
     const error: any = new Error('Monitoring no encontrado');
@@ -146,7 +139,7 @@ export async function update(id: number, dto: UpdateMonitoringDTO): Promise<Moni
 
   params.push(id);
   const sql = `UPDATE monitorings SET ${updates.join(', ')} WHERE id = ?`;
-  await db.run(sql, ...params);
+  db.prepare(sql).run(...params);
 
   const updated = await getById(id);
 

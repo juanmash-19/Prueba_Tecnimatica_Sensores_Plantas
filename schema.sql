@@ -41,22 +41,22 @@ INSERT INTO sensors (name, type, manufacturer, manufacture_date) VALUES
 ('TempSensor-A','temperatura','Siemens','2018-05-12'),
 ('FlowMeter-1','flujo','Honeywell','2019-03-21'),
 ('VibeX-200','vibracion','ABB','2020-07-11'),
-('PressurePro','presion','Schneider','2017-11-02'),
 ('TempSensor-B','temperatura','Emerson','2021-01-15'),
-('FlowMeter-2','flujo','Endress+Hauser','2016-09-05'),
 ('VibeX-300','vibracion','SKF','2022-02-20'),
+('FlowMeter-2','flujo','Endress+Hauser','2016-09-05'),
 ('PressureMax','presion','Yokogawa','2015-12-30'),
-('TempSensor-C','temperatura','General Electric','2014-08-08'),
-('FlowMeter-3','flujo','ABB','2023-04-01');
+('PressureGauge-W1','presion','Wika','2017-11-02'),
+('PressureGauge-K1','presion','Keller','2014-08-08'),
+('VibeSense-BK1','vibracion','Brüel & Kjær','2023-04-01');
 
 -- Insert sample zones (6)
 INSERT INTO zones (name, description, location, operational_status) VALUES
 ('Calderas','Zona de calderas','Planta A - Sector 1','activa'),
 ('Compresores','Sala de compresores','Planta A - Sector 2','activa'),
-('Tuberias','Red de tuberias principales','Planta B - Sector 1','mantenimiento'),
+('Tuberías','Red de tuberías principales','Planta B - Sector 1','mantenimiento'),
 ('Motores','Banco de motores','Planta B - Sector 3','activa'),
-('Almacenamiento','Area de almacenamiento','Planta C - Sector 1','inactiva'),
-('Empaque','Linea de empaque','Planta C - Sector 2','activa');
+('Almacenamiento','Área de almacenamiento','Planta C - Sector 1','inactiva'),
+('Empaque','Línea de empaque','Planta C - Sector 2','activa');
 
 -- Insert sample monitorings (12) with mixed statuses and types
 INSERT INTO monitorings (sensor_id, zone_id, install_date, reading_type, threshold_value, status) VALUES
@@ -68,7 +68,7 @@ INSERT INTO monitorings (sensor_id, zone_id, install_date, reading_type, thresho
 (6,3,'2019-06-20','flujo',5.0,'pausado'),
 (7,4,'2020-08-08','vibracion',3.2,'activo'),
 (8,2,'2018-09-09','presion',150.0,'activo'),
-(9,5,'2017-10-10','temperatura',70.0,'pausado'),
+(9,5,'2017-10-10','presion',70.0,'pausado'),
 (10,6,'2023-05-05','flujo',12.0,'activo'),
 (1,2,'2022-04-04','temperatura',65.0,'activo'),
 (3,1,'2021-11-11','vibracion',2.0,'activo');

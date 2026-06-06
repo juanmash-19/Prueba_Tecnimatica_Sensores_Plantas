@@ -11,15 +11,6 @@ import type {
 
 const API_BASE = 'http://localhost:3000/api'
 
-const ZONE_CATALOG: Zone[] = [
-  { id: 1, name: 'Calderas', description: 'Zona de calderas', location: 'Planta A - Sector 1', operational_status: 'activa' },
-  { id: 2, name: 'Compresores', description: 'Sala de compresores', location: 'Planta A - Sector 2', operational_status: 'activa' },
-  { id: 3, name: 'Tuberías', description: 'Red de tuberías principales', location: 'Planta B - Sector 1', operational_status: 'mantenimiento' },
-  { id: 4, name: 'Motores', description: 'Banco de motores', location: 'Planta B - Sector 3', operational_status: 'activa' },
-  { id: 5, name: 'Almacenamiento', description: 'Área de almacenamiento', location: 'Planta C - Sector 1', operational_status: 'inactiva' },
-  { id: 6, name: 'Empaque', description: 'Línea de empaque', location: 'Planta C - Sector 2', operational_status: 'activa' },
-]
-
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {
@@ -44,7 +35,8 @@ export async function getSensors(): Promise<Sensor[]> {
 }
 
 export async function getZones(): Promise<Zone[]> {
-  return ZONE_CATALOG
+  const response = await request<{ data: Zone[] }>('/zones')
+  return response.data
 }
 
 export async function getZoneSensors(zoneId: number): Promise<ZoneSensorsResponse> {

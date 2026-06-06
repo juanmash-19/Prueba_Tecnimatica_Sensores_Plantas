@@ -21,39 +21,28 @@ export function ZonesPage() {
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
 
+  async function loadZones() {
+    setLoading(true)
+    setError(null)
+
+    try {
+      const baseZones = await getZones()
+      const counts = await Promise.all(
+        baseZones.map(async (zone) => {
+          const response = await getZoneSensors(zone.id)
+          return { ...zone, active_sensor_count: response.total }
+        }),
+      )
+      setZones(counts)
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'No se pudieron cargar las zonas')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    let active = true
-
-    async function load() {
-      try {
-        setLoading(true)
-        setError(null)
-        const baseZones = await getZones()
-        const counts = await Promise.all(
-          baseZones.map(async (zone) => {
-            const response = await getZoneSensors(zone.id)
-            return { ...zone, active_sensor_count: response.total }
-          }),
-        )
-        if (active) {
-          setZones(counts)
-        }
-      } catch (loadError) {
-        if (active) {
-          setError(loadError instanceof Error ? loadError.message : 'No se pudieron cargar las zonas')
-        }
-      } finally {
-        if (active) {
-          setLoading(false)
-        }
-      }
-    }
-
-    void load()
-
-    return () => {
-      active = false
-    }
+    void loadZones()
   }, [])
 
   const totalActiveSensors = useMemo(() => zones.reduce((sum, zone) => sum + zone.active_sensor_count, 0), [zones])
@@ -71,7 +60,14 @@ export function ZonesPage() {
         </button>
       </div>
 
-      {showForm ? <AssignSensorForm onCreated={() => setShowForm(false)} /> : null}
+      {showForm ? (
+        <AssignSensorForm
+          onCreated={() => {
+            setShowForm(false)
+            void loadZones()
+          }}
+        />
+      ) : null}
 
       <div className="rounded-3xl border border-slate-800 bg-slate-900/60 p-5 text-sm text-slate-300">
         Sensores activos totales: <span className="font-semibold text-cyan-300">{totalActiveSensors}</span>

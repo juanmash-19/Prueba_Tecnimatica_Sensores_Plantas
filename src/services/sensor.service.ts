@@ -22,20 +22,20 @@ export async function getZonesBySensor(sensorId: number) {
     sensorId
   );
 
-  return rows.map((r: any) => ({
+  return rows.map((row: any) => ({
     zone: {
-      id: r.zone_id,
-      name: r.zone_name,
-      description: r.description,
-      location: r.location,
-      operational_status: r.operational_status,
+      id: row.zone_id,
+      name: row.zone_name,
+      description: row.description,
+      location: row.location,
+      operational_status: row.operational_status,
     },
     monitoring: {
-      id: r.monitoring_id,
-      install_date: r.install_date,
-      reading_type: r.reading_type,
-      threshold_value: r.threshold_value,
-      status: r.monitoring_status,
-    }
+      id: row.monitoring_id,
+      install_date: row.install_date,
+      reading_type: row.reading_type,
+      threshold_value: row.threshold_value,
+      status: row.monitoring_status,
+    },
   }));
 }

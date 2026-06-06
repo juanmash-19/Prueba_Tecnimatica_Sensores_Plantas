@@ -10,6 +10,10 @@ export function errorHandler(err: any, req: Request, res: Response, next: NextFu
   const isDev = process.env.NODE_ENV === 'development';
   const message = status === 500 ? 'Error interno del servidor' : err.message;
   const payload: any = { error: message };
-  if (isDev && err.stack) payload.stack = err.stack;
+
+  if (isDev && err.stack) {
+    payload.stack = err.stack;
+  }
+
   res.status(status).json(payload);
 }

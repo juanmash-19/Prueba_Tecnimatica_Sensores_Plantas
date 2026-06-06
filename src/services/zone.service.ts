@@ -13,12 +13,10 @@ export async function getById(id: number): Promise<Zone | null> {
 
 export async function getActiveSensorsByZone(zoneId: number) {
   const db = await getDb();
-  const rows = await db.all(
+  return db.all(
     `SELECT s.* FROM sensors s
      JOIN monitorings m ON m.sensor_id = s.id
      WHERE m.zone_id = ? AND m.status = 'activo'`,
     zoneId
   );
-
-  return rows;
 }

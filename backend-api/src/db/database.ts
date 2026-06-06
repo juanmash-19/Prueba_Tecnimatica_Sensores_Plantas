@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import Database from 'better-sqlite3';
 
-const dbPath = path.resolve(process.cwd(), '../../data/monitoring.db');
-const schemaPath = path.resolve(process.cwd(), 'schema.sql');
+const dbPath = path.resolve(__dirname, '../../data/monitoring.db');
+const schemaPath = path.resolve(__dirname, '../../schema.sql');
 
 function ensureDataDir() {
   const directory = path.dirname(dbPath);

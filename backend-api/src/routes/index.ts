@@ -7,6 +7,7 @@ const router = Router();
 
 router.get('/sensors', sensorController.getAll);
 router.get('/sensors/:id/zones', sensorController.getZones);
+router.get('/zones', zoneController.getAll);
 router.get('/zones/:id/sensors', zoneController.getActiveSensors);
 router.get('/monitorings', monitoringController.getAll);
 router.post('/monitorings', monitoringController.create);

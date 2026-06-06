@@ -1,6 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 import * as zoneService from '../services/zone.service';
 
+export async function getAll(req: Request, res: Response, next: NextFunction) {
+  try {
+    const data = await zoneService.getAll();
+    res.json({ data, total: data.length });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getActiveSensors(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);

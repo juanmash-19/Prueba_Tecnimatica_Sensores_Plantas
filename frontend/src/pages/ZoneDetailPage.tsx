@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { MonitoringControls } from '../components/MonitoringControls'
 import { MonitoringStatusBadge } from '../components/MonitoringStatusBadge'
 import { SensorBadge } from '../components/SensorBadge'
 import { ThresholdAlert } from '../components/ThresholdAlert'
 import { getMonitorings, getSensors, getZones } from '../services/api'
 import type { MonitoringWithDetails, Sensor, Zone } from '../types'
+import { getSimulatedReading } from '../utils/simulatedReading'
 
 const STATUS_STYLES: Record<Zone['operational_status'], string> = {
   activa: 'text-emerald-300 bg-emerald-500/10 border-emerald-400/20',
@@ -20,67 +22,55 @@ export function ZoneDetailPage() {
   const [zone, setZone] = useState<Zone | null>(null)
   const [monitorings, setMonitorings] = useState<MonitoringWithDetails[]>([])
   const [sensors, setSensors] = useState<Sensor[]>([])
-  const [currentValues, setCurrentValues] = useState<Record<number, number>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  useEffect(() => {
-    let active = true
+  const loadZoneDetail = useCallback(async () => {
+    setLoading(true)
+    setError('')
 
-    async function load() {
-      try {
-        setLoading(true)
-        setError('')
-
-        if (!Number.isInteger(zoneId)) {
-          throw new Error('Identificador de zona inválido')
-        }
-
-        const [zonesResponse, allMonitorings, allSensors] = await Promise.all([getZones(), getMonitorings(), getSensors()])
-        const currentZone = zonesResponse.find((item) => item.id === zoneId) ?? null
-
-        if (!currentZone) {
-          throw new Error('Zona no encontrada')
-        }
-
-        const zoneMonitorings = allMonitorings.filter((item) => item.zone_id === zoneId)
-
-        if (!active) {
-          return
-        }
-
-        setZone(currentZone)
-        setMonitorings(zoneMonitorings)
-        setSensors(allSensors)
-        setCurrentValues(
-          Object.fromEntries(zoneMonitorings.map((item) => [item.id, Number((Math.random() * 150).toFixed(1))])),
-        )
-      } catch (loadError) {
-        if (active) {
-          setError(loadError instanceof Error ? loadError.message : 'No se pudo cargar la zona')
-        }
-      } finally {
-        if (active) {
-          setLoading(false)
-        }
+    try {
+      if (!Number.isInteger(zoneId)) {
+        throw new Error('Identificador de zona inválido')
       }
-    }
 
-    void load()
+      const [zonesResponse, allMonitorings, allSensors] = await Promise.all([
+        getZones(),
+        getMonitorings(),
+        getSensors(),
+      ])
+      const currentZone = zonesResponse.find((item) => item.id === zoneId) ?? null
 
-    return () => {
-      active = false
+      if (!currentZone) {
+        throw new Error('Zona no encontrada')
+      }
+
+      setZone(currentZone)
+      setMonitorings(allMonitorings.filter((item) => item.zone_id === zoneId))
+      setSensors(allSensors)
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : 'No se pudo cargar la zona')
+    } finally {
+      setLoading(false)
     }
   }, [zoneId])
+
+  useEffect(() => {
+    void loadZoneDetail()
+  }, [loadZoneDetail])
 
   const sensorCards = useMemo<SensorViewModel[]>(
     () =>
       monitorings.map((monitoring) => ({
         ...monitoring,
-        currentValue: currentValues[monitoring.id] ?? 0,
+        currentValue: getSimulatedReading(monitoring.id, monitoring.sensor_id, monitoring.threshold_value),
       })),
-    [currentValues, monitorings],
+    [monitorings],
   )
+
+  function handleMonitoringUpdated(updated: MonitoringWithDetails) {
+    setMonitorings((current) => current.map((item) => (item.id === updated.id ? updated : item)))
+  }
 
   if (loading) {
     return (
@@ -129,7 +119,7 @@ export function ZoneDetailPage() {
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold text-slate-50">Sensores monitoreados</h2>
         <Link to="/" className="rounded-2xl border border-slate-700 px-4 py-2 text-sm text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-200">
-          Volver a ZonesPage
+          Volver a Zonas
         </Link>
       </div>
 
@@ -158,6 +148,9 @@ export function ZoneDetailPage() {
                   <p className="text-sm text-slate-400">
                     Tipo de lectura configurado: <span className="text-slate-200">{sensor.reading_type}</span>
                   </p>
+                  <p className="text-sm text-slate-400">
+                    Instalado: <span className="text-slate-200">{sensor.install_date}</span>
+                  </p>
                 </div>
 
                 <div className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-300">
@@ -167,14 +160,15 @@ export function ZoneDetailPage() {
 
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <div className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-300">
-                  Sensor: <span className="text-slate-100">{sensor.sensor_name}</span>
+                  Valor actual simulado: <span className="text-slate-100">{sensor.currentValue.toFixed(1)}</span>
                 </div>
                 <div className="rounded-2xl border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-300">
-                  Valor actual simulado: <span className="text-slate-100">{sensor.currentValue.toFixed(1)}</span>
+                  Estado operativo del sensor: <span className="text-slate-100">{sensor.status}</span>
                 </div>
               </div>
 
               <ThresholdAlert currentValue={sensor.currentValue} threshold={sensor.threshold_value} />
+              <MonitoringControls monitoring={sensor} onUpdated={handleMonitoringUpdated} />
             </article>
           )
         })}

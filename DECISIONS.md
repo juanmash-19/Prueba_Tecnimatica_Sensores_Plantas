@@ -50,6 +50,8 @@ Implementaría **validación de esquema con Zod en los endpoints** y un sistema 
 
 **¿Por qué historial de lecturas?** El sistema actual almacena la *configuración* del monitoreo pero no los *valores reales* medidos por los sensores. Sin un historial de lecturas no es posible mostrar si un sensor supera el umbral en tiempo real, ni generar alertas, ni hacer análisis histórico — funcionalidades críticas para una planta industrial real.
 
+Mientras tanto, el frontend usa una función determinística (`getSimulatedReading`) para generar valores de demostración consistentes y poder mostrar alertas de umbral sin depender de datos aleatorios en cada recarga.
+
 ---
 
 ## Stack tecnológico

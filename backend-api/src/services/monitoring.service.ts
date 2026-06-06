@@ -43,19 +43,25 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
   const db = getDb();
 
   if (!validTypes.includes(dto.reading_type)) {
-    const error: any = new Error('reading_type inválido');
+    const error: any = new Error(
+      `Tipo de lectura inválido: "${dto.reading_type}". Valores permitidos: ${validTypes.join(', ')}`
+    );
     error.status = 400;
     throw error;
   }
 
   if (!(dto.threshold_value > 0)) {
-    const error: any = new Error('threshold_value debe ser mayor que 0');
+    const error: any = new Error(
+      `El valor umbral debe ser mayor que 0, se recibió: ${dto.threshold_value}`
+    );
     error.status = 400;
     throw error;
   }
 
   if (dto.status && !validStatuses.includes(dto.status)) {
-    const error: any = new Error('status inválido');
+    const error: any = new Error(
+      `Estado inválido: "${dto.status}". Valores permitidos: ${validStatuses.join(', ')}`
+    );
     error.status = 400;
     throw error;
   }
@@ -63,7 +69,7 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
   const sensor = db.prepare('SELECT id FROM sensors WHERE id = ?').get(dto.sensor_id);
 
   if (!sensor) {
-    const error: any = new Error('Sensor no existe');
+    const error: any = new Error(`No existe un sensor con ID ${dto.sensor_id}`);
     error.status = 404;
     throw error;
   }
@@ -71,7 +77,7 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
   const zone = db.prepare('SELECT id FROM zones WHERE id = ?').get(dto.zone_id);
 
   if (!zone) {
-    const error: any = new Error('Zone no existe');
+    const error: any = new Error(`No existe una zona con ID ${dto.zone_id}`);
     error.status = 404;
     throw error;
   }
@@ -79,7 +85,9 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
   const exists = db.prepare('SELECT id FROM monitorings WHERE sensor_id = ? AND zone_id = ?').get(dto.sensor_id, dto.zone_id);
 
   if (exists) {
-    const error: any = new Error('Monitoring para ese sensor y zona ya existe');
+    const error: any = new Error(
+      `El sensor ${dto.sensor_id} ya está asignado a la zona ${dto.zone_id}`
+    );
     error.status = 400;
     throw error;
   }
@@ -99,7 +107,9 @@ export async function update(id: number, dto: UpdateMonitoringDTO): Promise<Moni
   const db = getDb();
 
   if (!dto || (dto.threshold_value === undefined && dto.status === undefined)) {
-    const error: any = new Error('Sin campos para actualizar');
+    const error: any = new Error(
+      'Se debe enviar al menos un campo para actualizar: threshold_value o status'
+    );
     error.status = 400;
     throw error;
   }
@@ -107,7 +117,7 @@ export async function update(id: number, dto: UpdateMonitoringDTO): Promise<Moni
   const existing = db.prepare('SELECT * FROM monitorings WHERE id = ?').get(id);
 
   if (!existing) {
-    const error: any = new Error('Monitoring no encontrado');
+    const error: any = new Error(`No existe un monitoreo con ID ${id}`);
     error.status = 404;
     throw error;
   }
@@ -117,7 +127,9 @@ export async function update(id: number, dto: UpdateMonitoringDTO): Promise<Moni
 
   if (dto.threshold_value !== undefined) {
     if (!(dto.threshold_value > 0)) {
-      const error: any = new Error('threshold_value debe ser mayor que 0');
+      const error: any = new Error(
+        `El valor umbral debe ser mayor que 0, se recibió: ${dto.threshold_value}`
+      );
       error.status = 400;
       throw error;
     }
@@ -128,7 +140,9 @@ export async function update(id: number, dto: UpdateMonitoringDTO): Promise<Moni
 
   if (dto.status !== undefined) {
     if (!validStatuses.includes(dto.status)) {
-      const error: any = new Error('status inválido');
+      const error: any = new Error(
+        `Estado inválido: "${dto.status}". Valores permitidos: ${validStatuses.join(', ')}`
+      );
       error.status = 400;
       throw error;
     }

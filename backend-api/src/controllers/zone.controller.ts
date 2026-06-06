@@ -21,7 +21,7 @@ export async function getActiveSensors(req: Request, res: Response, next: NextFu
     const zone = await zoneService.getById(id);
 
     if (!zone) {
-      return res.status(404).json({ error: 'Zone no encontrada' });
+      return res.status(404).json({ error: `Zona con ID ${id} no encontrada` });
     }
 
     const sensors = await zoneService.getActiveSensorsByZone(id);

@@ -41,6 +41,5 @@ El frontend corre en http://localhost:5173 y consume la API en http://localhost:
 
 ## Notas de entrega
 
-- La rama `main` contiene la base del backend.
-- La rama `front` contiene la interfaz del frontend.
+- La rama `main` contiene el backend y el frontend.
 - El backend y el frontend están preparados para ejecutarse por separado.

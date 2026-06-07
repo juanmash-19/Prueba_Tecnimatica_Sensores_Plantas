@@ -69,17 +69,22 @@ export function MonitoringControls({ monitoring, onUpdated }: MonitoringControls
   }
 
   return (
-    <div className="mt-5 rounded-2xl border border-slate-800 bg-slate-950/60 p-4">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm font-medium text-slate-200">Configuración del monitoreo</p>
+    <div className="mt-5 rounded-2xl border border-white/5 bg-slate-950/50 p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="flex items-center gap-2 text-sm font-semibold text-slate-200">
+          <svg className="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+          Configuración del monitoreo
+        </p>
         <MonitoringStatusBadge status={status} />
       </div>
 
       <div className="grid gap-4 md:grid-cols-[1fr_auto_auto] md:items-end">
-        <label className="grid gap-2 text-sm text-slate-300">
+        <label className="grid gap-2 text-sm font-medium text-slate-300">
           Umbral
           <input
-            className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100"
+            className="input-field"
             type="number"
             min="0.1"
             step="0.1"
@@ -90,7 +95,7 @@ export function MonitoringControls({ monitoring, onUpdated }: MonitoringControls
 
         <button
           type="button"
-          className="rounded-xl bg-cyan-400 px-4 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-primary"
           onClick={() => void handleSave()}
           disabled={saving}
         >
@@ -99,7 +104,7 @@ export function MonitoringControls({ monitoring, onUpdated }: MonitoringControls
 
         <button
           type="button"
-          className="rounded-xl border border-slate-700 px-4 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/40 hover:text-cyan-200 disabled:cursor-not-allowed disabled:opacity-60"
+          className="btn-secondary"
           onClick={() => void handleToggleStatus()}
           disabled={saving}
         >
@@ -107,8 +112,22 @@ export function MonitoringControls({ monitoring, onUpdated }: MonitoringControls
         </button>
       </div>
 
-      {message ? <p className="mt-3 text-sm text-emerald-300">{message}</p> : null}
-      {error ? <p className="mt-3 text-sm text-rose-300">{error}</p> : null}
+      {message ? (
+        <p className="mt-3 flex items-center gap-2 text-sm text-emerald-300">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          {message}
+        </p>
+      ) : null}
+      {error ? (
+        <p className="mt-3 flex items-center gap-2 text-sm text-rose-300">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          {error}
+        </p>
+      ) : null}
     </div>
   )
 }

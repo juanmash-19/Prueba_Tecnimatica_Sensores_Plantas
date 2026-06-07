@@ -76,29 +76,43 @@ export function AssignSensorForm({ onCreated }: AssignSensorFormProps) {
   }
 
   return (
-    <section className="rounded-3xl border border-cyan-400/20 bg-slate-900/90 p-6 shadow-2xl shadow-cyan-950/20">
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-50">Asignar sensor</h2>
-          <p className="text-sm text-slate-400">Crea un monitoreo entre un sensor y una zona</p>
+    <section className="glass-card relative overflow-hidden p-6 md:p-8">
+      <div className="pointer-events-none absolute -left-10 -top-10 h-40 w-40 rounded-full bg-cyan-400/10 blur-3xl" />
+
+      <div className="relative mb-6 flex items-center justify-between gap-4">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300 ring-1 ring-cyan-400/20">
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-50">Asignar sensor</h2>
+            <p className="text-sm text-slate-400">Vincula un sensor a una zona de monitoreo</p>
+          </div>
         </div>
-        {loading ? <span className="text-sm text-cyan-300">Cargando...</span> : null}
+        {loading ? (
+          <span className="flex items-center gap-2 text-sm text-cyan-300">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-cyan-400/30 border-t-cyan-300" />
+            Cargando...
+          </span>
+        ) : null}
       </div>
 
-      <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
-        <label className="grid gap-2 text-sm text-slate-300">
+      <form className="relative grid gap-5 md:grid-cols-2" onSubmit={handleSubmit}>
+        <label className="grid gap-2 text-sm font-medium text-slate-300">
           Sensor
-          <select className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100" value={sensorId} onChange={(event) => setSensorId(event.target.value)} required>
+          <select className="input-field" value={sensorId} onChange={(event) => setSensorId(event.target.value)} required>
             <option value="">Selecciona un sensor</option>
             {sensors.map((sensor) => (
-              <option key={sensor.id} value={sensor.id}>{sensor.name} - {sensor.manufacturer}</option>
+              <option key={sensor.id} value={sensor.id}>{sensor.name} — {sensor.manufacturer}</option>
             ))}
           </select>
         </label>
 
-        <label className="grid gap-2 text-sm text-slate-300">
+        <label className="grid gap-2 text-sm font-medium text-slate-300">
           Zona
-          <select className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100" value={zoneId} onChange={(event) => setZoneId(event.target.value)} required>
+          <select className="input-field" value={zoneId} onChange={(event) => setZoneId(event.target.value)} required>
             <option value="">Selecciona una zona</option>
             {zones.map((zone) => (
               <option key={zone.id} value={zone.id}>{zone.name}</option>
@@ -106,36 +120,50 @@ export function AssignSensorForm({ onCreated }: AssignSensorFormProps) {
           </select>
         </label>
 
-        <label className="grid gap-2 text-sm text-slate-300">
+        <label className="grid gap-2 text-sm font-medium text-slate-300">
           Tipo de lectura
-          <select className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100" value={readingType} onChange={(event) => setReadingType(event.target.value as SensorType)}>
+          <select className="input-field" value={readingType} onChange={(event) => setReadingType(event.target.value as SensorType)}>
             {SENSOR_TYPES.map((type) => <option key={type} value={type}>{type}</option>)}
           </select>
         </label>
 
-        <label className="grid gap-2 text-sm text-slate-300">
+        <label className="grid gap-2 text-sm font-medium text-slate-300">
           Estado
-          <select className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100" value={status} onChange={(event) => setStatus(event.target.value as MonitoringStatus)}>
+          <select className="input-field" value={status} onChange={(event) => setStatus(event.target.value as MonitoringStatus)}>
             {MONITORING_STATUSES.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
 
-        <label className="grid gap-2 text-sm text-slate-300">
+        <label className="grid gap-2 text-sm font-medium text-slate-300">
           Umbral
-          <input className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100" type="number" min="0" step="0.1" value={thresholdValue} onChange={(event) => setThresholdValue(event.target.value)} placeholder="95.5" required />
+          <input className="input-field" type="number" min="0" step="0.1" value={thresholdValue} onChange={(event) => setThresholdValue(event.target.value)} placeholder="95.5" required />
         </label>
 
-        <label className="grid gap-2 text-sm text-slate-300">
+        <label className="grid gap-2 text-sm font-medium text-slate-300">
           Fecha de instalación
-          <input className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100" type="date" value={installDate} onChange={(event) => setInstallDate(event.target.value)} required />
+          <input className="input-field" type="date" value={installDate} onChange={(event) => setInstallDate(event.target.value)} required />
         </label>
 
-        <div className="md:col-span-2 flex items-center gap-3">
-          <button className="rounded-xl bg-cyan-400 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60" type="submit" disabled={saving}>
+        <div className="flex flex-wrap items-center gap-3 md:col-span-2">
+          <button className="btn-primary" type="submit" disabled={saving}>
             {saving ? 'Guardando...' : 'Asignar sensor'}
           </button>
-          {message ? <span className="text-sm text-emerald-300">{message}</span> : null}
-          {error ? <span className="text-sm text-rose-300">{error}</span> : null}
+          {message ? (
+            <span className="flex items-center gap-2 text-sm text-emerald-300">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              {message}
+            </span>
+          ) : null}
+          {error ? (
+            <span className="flex items-center gap-2 text-sm text-rose-300">
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              {error}
+            </span>
+          ) : null}
         </div>
       </form>
     </section>

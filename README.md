@@ -33,6 +33,72 @@ npm run dev
 
 El frontend corre en http://localhost:5173 y consume la API en http://localhost:3000/api.
 
+## Pruebas unitarias
+
+El proyecto incluye pruebas con **Vitest**. Son opcionales: no se ejecutan al arrancar la app (`npm run dev`) ni se incluyen en el build de producción (`npm run build`).
+
+### Backend (43 tests)
+
+```bash
+cd backend-api
+npm install
+npm test          # ejecuta todas las pruebas una vez
+npm run test:watch  # modo interactivo (re-ejecuta al guardar)
+```
+
+**Qué se prueba:**
+
+| Capa | Archivo | Descripción |
+|------|---------|-------------|
+| Servicios | `src/services/*.service.test.ts` | Lógica de negocio: consultas, validaciones, creación y actualización de monitoreos |
+| HTTP | `src/test/http.routes.test.ts` | Endpoints REST con **supertest** (códigos 200, 201, 400, 404) |
+
+**Aislamiento:** las pruebas usan SQLite **en memoria** (`src/test/testDatabase.ts`) y un mock de `getDb()` definido en `src/test/setup.ts`. La base de datos real en `data/monitoring.db` no se modifica.
+
+**Estructura de archivos de prueba (backend):**
+
+```
+backend-api/
+├── vitest.config.ts          # configuración de Vitest (solo para tests)
+├── src/
+│   ├── app.ts                # app Express exportable (usada por supertest)
+│   ├── index.ts              # arranque del servidor en desarrollo/producción
+│   ├── test/
+│   │   ├── setup.ts          # mock de BD y reinicio entre tests
+│   │   ├── testDatabase.ts   # creación de BD en memoria
+│   │   └── http.routes.test.ts
+│   └── services/
+│       ├── monitoring.service.test.ts
+│       ├── sensor.service.test.ts
+│       └── zone.service.test.ts
+```
+
+### Frontend (11 tests)
+
+```bash
+cd frontend
+npm install
+npm test
+npm run test:watch
+```
+
+**Qué se prueba:**
+
+| Archivo | Descripción |
+|---------|-------------|
+| `src/utils/simulatedReading.test.ts` | Lecturas simuladas determinísticas y lógica de umbral |
+| `src/components/ThresholdAlert.test.tsx` | Alerta visual cuando el valor supera el umbral |
+| `src/components/MonitoringStatusBadge.test.tsx` | Badge de estado activo/pausado |
+
+**Aislamiento:** la configuración de Vitest está en `vitest.config.ts` (separada de `vite.config.ts`). Los archivos `*.test.ts(x)` y la carpeta `src/test/` se excluyen del build de la aplicación.
+
+### Dependencias de prueba
+
+Solo están en `devDependencies` (no se instalan en producción):
+
+- **Backend:** `vitest`, `supertest`
+- **Frontend:** `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`
+
 ## Archivos importantes
 
 - [DECISIONS.md](DECISIONS.md) — Decisiones técnicas del proyecto

@@ -4,16 +4,23 @@ import { AssignSensorForm } from '../components/AssignSensorForm'
 import { getZoneSensors, getZones } from '../services/api'
 import type { ZoneWithCount } from '../types'
 
+/** Estilos visuales del badge según el estado operativo de la zona. */
 const STATUS_STYLES: Record<ZoneWithCount['operational_status'], string> = {
   activa: 'bg-emerald-500/15 text-emerald-300 ring-emerald-400/30',
   inactiva: 'bg-rose-500/15 text-rose-300 ring-rose-400/30',
   mantenimiento: 'bg-amber-500/15 text-amber-300 ring-amber-400/30',
 }
 
+/** Placeholder animado mientras se cargan las tarjetas de zonas. */
 function LoadingCard() {
   return <div className="h-40 animate-pulse rounded-3xl border border-slate-800 bg-slate-900/80" />
 }
 
+/**
+ * Página principal del panel de zonas.
+ * Lista todas las zonas con su estado operativo y cantidad de sensores activos,
+ * y permite abrir el formulario para asignar un sensor a una zona.
+ */
 export function ZonesPage() {
   const navigate = useNavigate()
   const [zones, setZones] = useState<ZoneWithCount[]>([])
@@ -21,6 +28,7 @@ export function ZonesPage() {
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
 
+  /** Carga las zonas y enriquece cada una con el conteo de sensores activos. */
   async function loadZones() {
     setLoading(true)
     setError(null)

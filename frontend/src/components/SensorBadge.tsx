@@ -7,6 +7,9 @@ const TYPE_STYLES: Record<SensorType, string> = {
   flujo: 'bg-emerald-500/15 text-emerald-200 ring-emerald-400/30',
 }
 
+/**
+ * Badge con color según el tipo de sensor (temperatura, presión, vibración o flujo).
+ */
 export function SensorBadge({ type }: { type: SensorType }) {
   return (
     <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ${TYPE_STYLES[type]}`}>

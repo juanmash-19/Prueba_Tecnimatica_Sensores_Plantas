@@ -5,6 +5,9 @@ import Database from 'better-sqlite3';
 const dbPath = path.resolve(__dirname, '../../data/monitoring.db');
 const schemaPath = path.resolve(__dirname, '../../schema.sql');
 
+/**
+ * Crea el directorio `data/` si no existe para almacenar el archivo SQLite.
+ */
 function ensureDataDir() {
   const directory = path.dirname(dbPath);
 
@@ -13,6 +16,10 @@ function ensureDataDir() {
   }
 }
 
+/**
+ * Abre o inicializa la base de datos SQLite.
+ * Si las tablas no existen o están vacías, ejecuta el esquema con datos de prueba.
+ */
 function createDatabase() {
   ensureDataDir();
 
@@ -37,6 +44,10 @@ type DatabaseConnection = ReturnType<typeof createDatabase>;
 
 let databaseInstance: DatabaseConnection | null = null;
 
+/**
+ * Inicializa la conexión singleton a la base de datos de producción/desarrollo.
+ * Reutiliza la instancia existente si ya fue creada.
+ */
 export function initDatabase(): DatabaseConnection {
   if (databaseInstance) {
     return databaseInstance;
@@ -46,6 +57,9 @@ export function initDatabase(): DatabaseConnection {
   return databaseInstance;
 }
 
+/**
+ * Devuelve la instancia activa de la base de datos, inicializándola si es necesario.
+ */
 export function getDb(): DatabaseConnection {
   return databaseInstance ?? initDatabase();
 }

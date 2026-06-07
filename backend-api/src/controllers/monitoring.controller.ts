@@ -2,6 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import * as monitoringService from '../services/monitoring.service';
 import { CreateMonitoringDTO, UpdateMonitoringDTO } from '../types';
 
+/**
+ * GET /api/monitorings — Lista monitoreos, con filtro opcional por `?status=activo|pausado`.
+ */
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   try {
     const status = req.query.status as any;
@@ -17,6 +20,10 @@ export async function getAll(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+/**
+ * POST /api/monitorings — Crea una nueva asignación sensor-zona.
+ * Valida campos obligatorios antes de delegar al servicio de negocio.
+ */
 export async function create(req: Request, res: Response, next: NextFunction) {
   try {
     const dto = req.body as CreateMonitoringDTO;
@@ -43,6 +50,10 @@ export async function create(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+/**
+ * PATCH /api/monitorings/:id — Actualiza umbral y/o estado de un monitoreo.
+ * Valida que el parámetro `id` sea un entero antes de aplicar cambios.
+ */
 export async function update(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);

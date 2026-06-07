@@ -1,3 +1,7 @@
+/**
+ * Muestra una alerta visual cuando el valor actual supera el umbral configurado.
+ * No renderiza nada si la lectura está dentro del rango aceptable.
+ */
 export function ThresholdAlert({ currentValue, threshold }: { currentValue: number; threshold: number }) {
   if (currentValue <= threshold) {
     return null

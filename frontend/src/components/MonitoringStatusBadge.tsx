@@ -1,5 +1,8 @@
 import type { MonitoringStatus } from '../types'
 
+/**
+ * Badge visual que indica si un monitoreo está activo o pausado.
+ */
 export function MonitoringStatusBadge({ status }: { status: MonitoringStatus }) {
   const styles =
     status === 'activo'

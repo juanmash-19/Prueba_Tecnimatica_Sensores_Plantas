@@ -1,3 +1,13 @@
+/**
+ * Genera una lectura simulada determinística para un monitoreo.
+ * Usa una semilla basada en IDs para que el valor sea consistente entre recargas.
+ * Aproximadamente el 40 % de las combinaciones superan el umbral (alerta de demostración).
+ *
+ * @param monitoringId - ID del monitoreo (parte de la semilla).
+ * @param sensorId - ID del sensor (parte de la semilla).
+ * @param threshold - Valor umbral configurado para el monitoreo.
+ * @returns Lectura simulada con un decimal de precisión.
+ */
 export function getSimulatedReading(monitoringId: number, sensorId: number, threshold: number): number {
   const seed = monitoringId * 37 + sensorId * 13
 

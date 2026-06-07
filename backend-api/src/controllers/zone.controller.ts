@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import * as zoneService from '../services/zone.service';
 
+/**
+ * GET /api/zones — Devuelve la lista completa de zonas de monitoreo.
+ */
 export async function getAll(req: Request, res: Response, next: NextFunction) {
   try {
     const data = await zoneService.getAll();
@@ -10,6 +13,10 @@ export async function getAll(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+/**
+ * GET /api/zones/:id/sensors — Devuelve los sensores activos asignados a una zona.
+ * Valida que el parámetro `id` sea un entero y que la zona exista.
+ */
 export async function getActiveSensors(req: Request, res: Response, next: NextFunction) {
   try {
     const id = Number(req.params.id);

@@ -8,14 +8,21 @@ import { getMonitorings, getSensors, getZones } from '../services/api'
 import type { MonitoringWithDetails, Sensor, Zone } from '../types'
 import { getSimulatedReading } from '../utils/simulatedReading'
 
+/** Estilos del indicador de estado operativo de la zona. */
 const STATUS_STYLES: Record<Zone['operational_status'], string> = {
   activa: 'text-emerald-300 bg-emerald-500/10 border-emerald-400/20',
   inactiva: 'text-slate-300 bg-slate-500/10 border-slate-400/20',
   mantenimiento: 'text-amber-300 bg-amber-500/10 border-amber-400/20',
 }
 
+/** Monitoreo enriquecido con la lectura simulada actual del sensor. */
 type SensorViewModel = MonitoringWithDetails & { currentValue: number }
 
+/**
+ * Página de detalle de una zona.
+ * Muestra información de la zona, los monitoreos asociados, lecturas simuladas,
+ * alertas de umbral y controles para pausar o ajustar cada monitoreo.
+ */
 export function ZoneDetailPage() {
   const { id } = useParams()
   const zoneId = Number(id)
@@ -25,6 +32,7 @@ export function ZoneDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  /** Carga la zona, sus monitoreos y el catálogo de sensores para mostrar fabricante. */
   const loadZoneDetail = useCallback(async () => {
     setLoading(true)
     setError('')
@@ -59,6 +67,7 @@ export function ZoneDetailPage() {
     void loadZoneDetail()
   }, [loadZoneDetail])
 
+  /** Combina cada monitoreo con su lectura simulada determinística. */
   const sensorCards = useMemo<SensorViewModel[]>(
     () =>
       monitorings.map((monitoring) => ({
@@ -68,6 +77,7 @@ export function ZoneDetailPage() {
     [monitorings],
   )
 
+  /** Actualiza en memoria un monitoreo tras pausar, reactivar o cambiar su umbral. */
   function handleMonitoringUpdated(updated: MonitoringWithDetails) {
     setMonitorings((current) => current.map((item) => (item.id === updated.id ? updated : item)))
   }

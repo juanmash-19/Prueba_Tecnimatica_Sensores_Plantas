@@ -1,16 +1,27 @@
 import { getDb } from '../db/database';
 import { Sensor } from '../types';
 
+/**
+ * Obtiene todos los sensores registrados en el sistema.
+ */
 export async function getAll(): Promise<Sensor[]> {
   const db = getDb();
   return db.prepare('SELECT * FROM sensors').all() as Sensor[];
 }
 
+/**
+ * Busca un sensor por su identificador numérico.
+ * @returns El sensor encontrado o `null` si no existe.
+ */
 export async function getById(id: number): Promise<Sensor | null> {
   const db = getDb();
   return (db.prepare('SELECT * FROM sensors WHERE id = ?').get(id) as Sensor | undefined) || null;
 }
 
+/**
+ * Lista las zonas monitoreadas por un sensor, incluyendo los datos del monitoreo asociado.
+ * @param sensorId - ID del sensor a consultar.
+ */
 export async function getZonesBySensor(sensorId: number) {
   const db = getDb();
   const rows = db

@@ -10,6 +10,10 @@ import {
 const validTypes: SensorType[] = ['temperatura', 'presion', 'vibracion', 'flujo'];
 const validStatuses: MonitoringStatus[] = ['activo', 'pausado'];
 
+/**
+ * Lista todos los monitoreos con detalles del sensor y la zona asociados.
+ * @param status - Filtro opcional por estado (`activo` o `pausado`).
+ */
 export async function getAll(status?: MonitoringStatus): Promise<MonitoringWithDetails[]> {
   const db = getDb();
   let sql = `SELECT m.*, s.name as sensor_name, s.type as sensor_type, z.name as zone_name, z.location as zone_location
@@ -26,6 +30,10 @@ export async function getAll(status?: MonitoringStatus): Promise<MonitoringWithD
   return db.prepare(sql).all(...params) as MonitoringWithDetails[];
 }
 
+/**
+ * Busca un monitoreo por ID, incluyendo nombre del sensor y de la zona.
+ * @returns El monitoreo con detalles o `null` si no existe.
+ */
 export async function getById(id: number): Promise<MonitoringWithDetails | null> {
   const db = getDb();
   const row = db.prepare(
@@ -39,6 +47,11 @@ export async function getById(id: number): Promise<MonitoringWithDetails | null>
   return row || null;
 }
 
+/**
+ * Asigna un sensor a una zona creando un nuevo monitoreo.
+ * Valida tipo de lectura, umbral positivo, existencia de entidades y unicidad sensor-zona.
+ * @throws Error con `status` 400 o 404 según el tipo de validación fallida.
+ */
 export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDetails> {
   const db = getDb();
 
@@ -103,6 +116,11 @@ export async function create(dto: CreateMonitoringDTO): Promise<MonitoringWithDe
   return created as MonitoringWithDetails;
 }
 
+/**
+ * Actualiza el umbral y/o el estado de un monitoreo existente.
+ * Requiere al menos uno de los campos `threshold_value` o `status`.
+ * @throws Error con `status` 400 o 404 según el tipo de validación fallida.
+ */
 export async function update(id: number, dto: UpdateMonitoringDTO): Promise<MonitoringWithDetails> {
   const db = getDb();
 

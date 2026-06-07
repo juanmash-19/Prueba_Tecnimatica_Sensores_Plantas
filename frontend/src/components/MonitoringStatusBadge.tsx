@@ -13,6 +13,7 @@ const STATUS_CONFIG: Record<MonitoringStatus, { label: string; styles: string; d
   },
 }
 
+/** Indicador visual del estado del monitoreo: activo o pausado. */
 export function MonitoringStatusBadge({ status }: { status: MonitoringStatus }) {
   const config = STATUS_CONFIG[status]
 

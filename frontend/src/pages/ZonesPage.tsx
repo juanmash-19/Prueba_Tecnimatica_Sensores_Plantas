@@ -4,6 +4,7 @@ import { AssignSensorForm } from '../components/AssignSensorForm'
 import { getZoneSensors, getZones } from '../services/api'
 import type { ZoneWithCount } from '../types'
 
+/** Configuración visual del estado operativo de cada zona (activa, inactiva, mantenimiento). */
 const STATUS_CONFIG: Record<
   ZoneWithCount['operational_status'],
   { label: string; styles: string; accent: string; dot: string }
@@ -28,6 +29,7 @@ const STATUS_CONFIG: Record<
   },
 }
 
+/** Placeholder de carga mientras se obtienen las zonas desde la API. */
 function LoadingCard() {
   return (
     <div className="glass-card h-52 animate-pulse overflow-hidden p-6">
@@ -56,6 +58,10 @@ function StatCard({ label, value, hint, icon }: { label: string; value: string |
   )
 }
 
+/**
+ * Vista principal: listado de zonas con la cantidad de sensores activos en cada una.
+ * Permite abrir el formulario de asignación sensor-zona (POST /monitorings).
+ */
 export function ZonesPage() {
   const navigate = useNavigate()
   const [zones, setZones] = useState<ZoneWithCount[]>([])
@@ -63,6 +69,7 @@ export function ZonesPage() {
   const [error, setError] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
 
+  /** Carga zonas y consulta GET /zones/:id/sensors para contar solo monitoreos activos. */
   async function loadZones() {
     setLoading(true)
     setError(null)

@@ -15,8 +15,13 @@ const STATUS_CONFIG: Record<Zone['operational_status'], { label: string; styles:
   mantenimiento: { label: 'Mantenimiento', styles: 'text-amber-300 bg-amber-500/10 border-amber-400/25' },
 }
 
+/** Monitoreo enriquecido con lectura simulada para evaluar el umbral en pantalla. */
 type SensorViewModel = MonitoringWithDetails & { currentValue: number }
 
+/**
+ * Vista detalle de una zona: sensores asignados, tipo de lectura, umbral y estado del monitoreo.
+ * Muestra alerta visual cuando la lectura simulada supera el umbral configurado.
+ */
 export function ZoneDetailPage() {
   const { id } = useParams()
   const zoneId = Number(id)
@@ -26,6 +31,7 @@ export function ZoneDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  /** Carga la zona, sus monitoreos (GET /monitorings) y el catálogo de sensores. */
   const loadZoneDetail = useCallback(async () => {
     setLoading(true)
     setError('')
@@ -60,6 +66,7 @@ export function ZoneDetailPage() {
     void loadZoneDetail()
   }, [loadZoneDetail])
 
+  /** Combina cada monitoreo con una lectura simulada determinística (sin tabla de lecturas reales). */
   const sensorCards = useMemo<SensorViewModel[]>(
     () =>
       monitorings.map((monitoring) => ({
@@ -74,6 +81,7 @@ export function ZoneDetailPage() {
     [sensorCards],
   )
 
+  /** Refleja en pantalla un cambio de umbral o estado tras PATCH /monitorings/:id. */
   function handleMonitoringUpdated(updated: MonitoringWithDetails) {
     setMonitorings((current) => current.map((item) => (item.id === updated.id ? updated : item)))
   }

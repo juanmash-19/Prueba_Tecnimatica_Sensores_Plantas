@@ -1,3 +1,7 @@
+/**
+ * Rutas de la API REST de monitoreo industrial.
+ * Prefijo montado en /api desde app.ts (p. ej. GET /api/sensors).
+ */
 import { Router } from 'express';
 import * as sensorController from '../controllers/sensor.controller';
 import * as zoneController from '../controllers/zone.controller';

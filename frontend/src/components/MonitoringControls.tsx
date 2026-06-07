@@ -8,6 +8,9 @@ interface MonitoringControlsProps {
   onUpdated: (updated: MonitoringWithDetails) => void
 }
 
+/**
+ * Permite actualizar el umbral y alternar el estado activo/pausado de un monitoreo (PATCH /monitorings/:id).
+ */
 export function MonitoringControls({ monitoring, onUpdated }: MonitoringControlsProps) {
   const [threshold, setThreshold] = useState(String(monitoring.threshold_value))
   const [status, setStatus] = useState<MonitoringStatus>(monitoring.status)

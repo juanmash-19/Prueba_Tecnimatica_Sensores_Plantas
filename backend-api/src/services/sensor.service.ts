@@ -19,7 +19,8 @@ export async function getById(id: number): Promise<Sensor | null> {
 }
 
 /**
- * Lista las zonas monitoreadas por un sensor, incluyendo los datos del monitoreo asociado.
+ * Lista las zonas monitoreadas por un sensor (GET /sensors/:id/zones).
+ * Incluye datos de la relación: fecha de instalación, tipo de lectura, umbral y estado.
  * @param sensorId - ID del sensor a consultar.
  */
 export async function getZonesBySensor(sensorId: number) {

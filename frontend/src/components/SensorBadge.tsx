@@ -7,6 +7,7 @@ const TYPE_CONFIG: Record<SensorType, { label: string; styles: string }> = {
   flujo: { label: 'Flujo', styles: 'bg-emerald-500/15 text-emerald-200 ring-emerald-400/30' },
 }
 
+/** Muestra el tipo de lectura del monitoreo: temperatura, presión, vibración o flujo. */
 export function SensorBadge({ type }: { type: SensorType }) {
   const config = TYPE_CONFIG[type]
 

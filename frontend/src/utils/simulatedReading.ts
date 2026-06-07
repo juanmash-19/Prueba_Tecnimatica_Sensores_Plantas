@@ -1,7 +1,9 @@
 /**
  * Genera una lectura simulada determinística para un monitoreo.
- * Usa una semilla basada en IDs para que el valor sea consistente entre recargas.
- * Aproximadamente el 40 % de las combinaciones superan el umbral (alerta de demostración).
+ * No existe tabla de lecturas reales en la BD; esta función permite demostrar
+ * las alertas de umbral de forma consistente (ver DECISIONS.md).
+ * Usa una semilla basada en IDs para que el valor sea igual entre recargas.
+ * Aproximadamente el 40 % de las combinaciones superan el umbral.
  *
  * @param monitoringId - ID del monitoreo (parte de la semilla).
  * @param sensorId - ID del sensor (parte de la semilla).

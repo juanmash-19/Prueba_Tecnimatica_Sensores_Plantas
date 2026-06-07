@@ -9,6 +9,11 @@ interface AssignSensorFormProps {
   onCreated?: () => void
 }
 
+/**
+ * Formulario para asignar un sensor a una zona (POST /monitorings).
+ * Campos del enunciado: sensor, zona, tipo de lectura y umbral.
+ * También incluye fecha de instalación y estado inicial del monitoreo.
+ */
 export function AssignSensorForm({ onCreated }: AssignSensorFormProps) {
   const [sensors, setSensors] = useState<Sensor[]>([])
   const [zones, setZones] = useState<Zone[]>([])

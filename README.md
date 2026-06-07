@@ -13,6 +13,26 @@ Repositorio de entrega para la prueba técnica de sensores y zonas de monitoreo 
 - npm 9 o superior
 - Git
 
+## Cómo ejecutar el proyecto completo
+
+El frontend depende del backend. Hay que abrir 2 terminales por separado:
+
+```bash
+# Terminal 1 — API
+cd backend-api
+npm install
+npm run dev
+
+# Terminal 2 — Interfaz web
+cd frontend
+npm install
+npm run dev
+```
+
+- API: http://localhost:3000/api
+- App web: http://localhost:5173
+- Health check: http://localhost:3000/health
+
 ## Backend
 
 ```bash
@@ -32,6 +52,18 @@ npm run dev
 ```
 
 El frontend corre en http://localhost:5173 y consume la API en http://localhost:3000/api.
+
+### Funcionalidades implementadas
+
+| Requisito | Implementación |
+|-----------|----------------|
+| Listado de zonas con sensores activos | `ZonesPage` — consulta `GET /zones` y `GET /zones/:id/sensors` por zona |
+| Detalle de zona con sensores, tipo de lectura y umbral | `ZoneDetailPage` — muestra monitoreos, badges y lectura simulada |
+| Formulario para asignar sensor a zona | `AssignSensorForm` — `POST /monitorings` |
+| Indicador activo / pausado | `MonitoringStatusBadge` + controles en `MonitoringControls` |
+| Alerta cuando supera el umbral | `ThresholdAlert` + barra `ReadingGauge` (lectura vía `getSimulatedReading`) |
+
+> Las lecturas en pantalla son **simuladas de forma determinística** porque no hay tabla de lecturas reales. Esto está documentado en [DECISIONS.md](DECISIONS.md).
 
 ## Pruebas unitarias
 
@@ -86,7 +118,7 @@ npm run test:watch
 
 | Archivo | Descripción |
 |---------|-------------|
-| `src/utils/simulatedReading.test.ts` | Lecturas simuladas determinísticas y lógica de umbral |
+| `src/utils/simulatedReading.test.ts` | Lecturas simuladas determinísticas y comparación contra umbral |
 | `src/components/ThresholdAlert.test.tsx` | Alerta visual cuando el valor supera el umbral |
 | `src/components/MonitoringStatusBadge.test.tsx` | Badge de estado activo/pausado |
 
@@ -98,6 +130,8 @@ Solo están en `devDependencies` (no se instalan en producción):
 
 - **Backend:** `vitest`, `supertest`
 - **Frontend:** `vitest`, `@testing-library/react`, `@testing-library/jest-dom`, `jsdom`
+
+**Total:** 54 pruebas (43 backend + 11 frontend). No se ejecutan al usar `npm run dev`.
 
 ## Archivos importantes
 
@@ -116,6 +150,9 @@ Solo están en `devDependencies` (no se instalan en producción):
 | GET | `/api/monitorings` | Listar monitoreos (filtro opcional `?status=activo\|pausado`) |
 | POST | `/api/monitorings` | Asignar un sensor a una zona |
 | PATCH | `/api/monitorings/:id` | Actualizar umbral o estado de un monitoreo |
+| GET | `/health` | Verificar que el servidor está activo (extra) |
+
+> `GET /api/zones` no aparece en el enunciado original, pero es necesario para el listado de zonas en el frontend.
 
 ## Notas de entrega
 

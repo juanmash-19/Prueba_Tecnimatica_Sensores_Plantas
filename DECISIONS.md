@@ -28,15 +28,18 @@ Se adoptó una **arquitectura de tres capas** clásica:
 src/
 ├── types/         → Interfaces y tipos TypeScript del dominio
 ├── db/            → Conexión y configuración de la base de datos
-├── services/      → Lógica de negocio y consultas SQL
+├── services/      → Lógica de negocio, validaciones y consultas SQL
 ├── controllers/   → Manejo de requests/responses HTTP
 ├── routes/        → Definición de rutas y enlace con controladores
-└── middleware/    → Manejo global de errores y rutas no encontradas
+├── middleware/    → Manejo global de errores y rutas no encontradas
+├── app.ts         → Configuración de Express (exportable para pruebas HTTP)
+├── index.ts       → Arranque del servidor y conexión a la BD
+└── test/          → Utilidades de prueba (BD en memoria, setup de mocks)
 ```
 
 **¿Por qué esta organización?**
 - **Separación de responsabilidades**: cada capa tiene una única razón para cambiar. Si cambia la BD, solo se toca el servicio. Si cambia la API, solo se toca el controlador.
-- **Testabilidad**: los servicios pueden probarse de forma aislada sin levantar el servidor.
+- **Testabilidad**: los servicios se prueban con Vitest usando SQLite en memoria (mock de `getDb`), y los endpoints con supertest sobre `app.ts`, sin levantar el servidor ni tocar `data/monitoring.db`.
 - **Escalabilidad**: agregar nuevas entidades (ej. alertas, usuarios) solo requiere añadir archivos en las carpetas existentes sin modificar lo que ya funciona.
 - **Tipos separados**: los tipos e interfaces en `/types` evitan duplicación y sirven como contrato compartido entre capas.
 
@@ -46,7 +49,7 @@ src/
 
 Implementaría **validación de esquema con Zod en los endpoints** y un sistema básico de **historial de lecturas** (`readings`).
 
-**¿Por qué validación con Zod?** Actualmente las validaciones están dispersas en los controladores con condicionales manuales. Zod permitiría definir el esquema esperado de cada request en un solo lugar, con mensajes de error automáticos, precisos y tipados. Esto reduciría el código repetitivo y haría la API más robusta.
+**¿Por qué validación con Zod?** Actualmente las validaciones están repartidas entre controladores (campos obligatorios, IDs enteros, query params) y servicios (reglas de negocio: umbral positivo, tipos válidos, duplicados sensor-zona). Zod permitiría definir el esquema esperado de cada request en un solo lugar, con mensajes de error automáticos, precisos y tipados. Esto reduciría el código repetitivo y haría la API más robusta.
 
 **¿Por qué historial de lecturas?** El sistema actual almacena la *configuración* del monitoreo pero no los *valores reales* medidos por los sensores. Sin un historial de lecturas no es posible mostrar si un sensor supera el umbral en tiempo real, ni generar alertas, ni hacer análisis histórico — funcionalidades críticas para una planta industrial real.
 
@@ -60,5 +63,6 @@ Mientras tanto, el frontend usa una función determinística (`getSimulatedReadi
 |------------|-------------------------------------|--------------------------------------------------------|
 | Backend    | Node.js + Express + TypeScript      | Ecosistema amplio, tipado estático, desarrollo ágil    |
 | Base datos | SQLite + better-sqlite3             | Sin instalación de servidor, perfecto para prueba técnica |
-| Frontend   | React + TypeScript + Vite           | Componentes reutilizables, build rápido                |
-| Estilos    | Tailwind CSS                        | Utilidades inline, consistencia visual, sin CSS extra  |
+| Frontend   | React + TypeScript + Vite + React Router | Componentes reutilizables, navegación entre vistas |
+| Estilos    | Tailwind CSS v4                     | Utilidades inline, consistencia visual, sin CSS extra  |
+| Pruebas    | Vitest + supertest (backend), Testing Library (frontend) | Cobertura aislada de servicios, endpoints y UI |
